@@ -47,6 +47,8 @@ class projection2D():
         #Link wheel-alone custom signal to a slot that will increment the current layer on mouse-wheel alone
         self.view.getViewBox().progressLayer.connect(self.wheel_alone_slot)
 
+        #Link mouse drag signal to trigger panning of other views
+        #self.view.getViewBox().mouseDragged.connect(self.mouse_drag_alone_slot)
 
     def addItemToPlotWidget(self,ingredient):
         """
@@ -220,7 +222,6 @@ class projection2D():
         """
         #self.updatePlotItems_2D(ingredients)  #TODO: Not have this here. This should be set when the mouse enters the axis and then not changed.
                                               # Like this it doesn't work if we are to change the displayed slice in the current axis using the mouse wheel.
-
         self.linkedYprojection.updatePlotItems_2D(ingredients,slicesToPlot[0])
         self.linkedXprojection.updatePlotItems_2D(ingredients,slicesToPlot[1])
 

@@ -159,8 +159,9 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.showCrossHairs = lasHelp.readPreference('showCrossHairs')
         self.mouseX = None
         self.mouseY = None
-        self.pixelValue = None
+        self.mousePressed = 0
         self.statusBarText = None
+
 
         #Lists of functions that are used as hooks for plugins to modify the behavior of built-in methods.
         #Hooks are named using the following convention: <lasagnaMethodName_[Start|End]> 
@@ -427,7 +428,11 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
+<<<<<<< Updated upstream
     def showStackLoadDialog(self,triggered=None,fileFilter="Images (*.mhd *.mha *.tiff *.tif)"):
+=======
+    def showStackLoadDialog(self,triggered=None,fileFilter=imageStackLoader.imageFilter()):
+>>>>>>> Stashed changes
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
@@ -436,6 +441,10 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         
         triggered - just catches the input from the signal so we can set fileFilter
         """
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
         fname = self.showFileLoadDialog(fileFilter=fileFilter)
@@ -459,7 +468,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         Bring up the file load dialog. Return the file name. Update the last used path. 
         """
         self.runHook(self.hooks['showFileLoadDialog_Start'])
-        print fileFilter
+
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', lasHelp.readPreference('lastLoadDir'), fileFilter)
         fname = str(fname)
         if len(fname) == 0:
@@ -968,6 +977,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
 
         #Build a text string to house these values
         valueStr = ''
+        
         while len(pixelValues)>0:
             valueStr = valueStr + '%d,' % pixelValues.pop()
 
@@ -1082,10 +1092,12 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         if self.stacksInTreeList()==False:
             return
 
-
+        #pos is the mouse position relative to the widget
         pos = evt[0] #Using signal proxy turns original arguments into a tuple
         self.removeCrossHairs()
 
+
+        #print self.mousePressed #TODO: REMOVE PROPERTY
         if self.axes2D[0].view.sceneBoundingRect().contains(pos):
             #TODO: figure out how to integrate this into object, because when we have that, we could
             #      do everything but the axis linking in the object. 
@@ -1096,7 +1108,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             (self.mouseX,self.mouseY)=self.axes2D[0].getMousePositionInCurrentView(pos)
             self.updateMainWindowOnMouseMove(self.axes2D[0]) #Update UI elements 
             self.axes2D[0].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY)) #Update displayed slice
-    
+
 
     def mouseMovedSaggital(self,evt):
         if self.stacksInTreeList()==False:
@@ -1131,7 +1143,15 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
             self.updateMainWindowOnMouseMove(self.axes2D[2])
             self.axes2D[2].updateDisplayedSlices_2D(self.ingredientList,(self.mouseX,self.mouseY))
 
+    """
+    def mousePressEvent(self, QMouseEvent):
+        print "pressed"
+        self.mousePressed=1
 
+    def mouseReleaseEvent(self, QMouseEvent):
+        print "released"
+        self.mousePressed=0
+    """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -1160,9 +1180,12 @@ def main(fnames, pluginToStart=None):
     # Link slots to signals
     #connect views to the mouseMoved slot. After connection this runs in the background. 
     #TODO: set up with just one slot that accepts arguments
+
+
     proxy1=pg.SignalProxy(tasty.axes2D[0].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedCoronal)
     proxy2=pg.SignalProxy(tasty.axes2D[1].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedSaggital)
-    proxy3=pg.SignalProxy(tasty.axes2D[2].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)
+    proxy3=pg.SignalProxy(tasty.axes2D[2].view.scene().sigMouseMoved, rateLimit=30, slot=tasty.mouseMovedTransverse)    
+
 
     sys.exit(app.exec_())
 

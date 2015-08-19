@@ -13,7 +13,7 @@ from PyQt4 import QtCore, QtGui
 class lasagna_viewBox(pg.ViewBox):
     mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal
     progressLayer = QtCore.pyqtSignal() #This fires when the user mouse-wheels without keyboard modifiers
-
+    mouseDragged = QtCore.pyqtSignal() #This fires when the user mouse-drags without keyboard modifiers
     def __init__(self, linkedAxis={}):
         super(lasagna_viewBox,self).__init__()
 
@@ -44,32 +44,35 @@ class lasagna_viewBox(pg.ViewBox):
         """
         Intercept pg.ViewBox.mouseDragEvent
         """
-        #Call the built-in mouseDragEvent
-        pg.ViewBox.mouseDragEvent(self,ev,axis)
+        if QtGui.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+            #Call the built-in mouseDragEvent
+            pg.ViewBox.mouseDragEvent(self,ev,axis)
 
-        if len(self.linkedAxis)==None:
-            return
+            if len(self.linkedAxis)==None:
+                return
 
-        for thisView in self.linkedAxis.keys():
-            #Get the current view center in x and y
-            vr = self.targetRect()
+            for thisView in self.linkedAxis.keys():
+                #Get the current view center in x and y
+                vr = self.targetRect()
 
-            x=None
-            y=None
+                x=None
+                y=None
 
-            if self.linkedAxis[thisView]['linkX']=='x':
-                x = vr.center().x()
+                if self.linkedAxis[thisView]['linkX']=='x':
+                    x = vr.center().x()
 
-            if self.linkedAxis[thisView]['linkY']=='y':
-                y = vr.center().y()
+                if self.linkedAxis[thisView]['linkY']=='y':
+                    y = vr.center().y()
 
-            if self.linkedAxis[thisView]['linkX']=='y':
-                y = vr.center().x()
+                if self.linkedAxis[thisView]['linkX']=='y':
+                    y = vr.center().x()
 
-            if self.linkedAxis[thisView]['linkY']=='x':
-                x = vr.center().y()
+                if self.linkedAxis[thisView]['linkY']=='x':
+                    x = vr.center().y()
 
-            self.centreOn(thisView,x,y)
+                self.centreOn(thisView,x,y)
+
+
 
 
     def centreOn(self,thisViewBox,x=None,y=None):
