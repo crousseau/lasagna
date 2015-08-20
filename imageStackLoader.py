@@ -291,3 +291,5 @@ def loadStack(fname):
   else:
     print fname + " not loaded. data type unknown"
 
+def imageFilter():
+  return "Images (*.mhd *.mha *.tiff *.tif)"

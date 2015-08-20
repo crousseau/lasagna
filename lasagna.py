@@ -428,11 +428,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         self.runHook(self.hooks['loadImageStack_End'])
 
 
-<<<<<<< Updated upstream
-    def showStackLoadDialog(self,triggered=None,fileFilter="Images (*.mhd *.mha *.tiff *.tif)"):
-=======
     def showStackLoadDialog(self,triggered=None,fileFilter=imageStackLoader.imageFilter()):
->>>>>>> Stashed changes
         """
         This slot brings up the file load dialog and gets the file name.
         If the file name is valid, it loads the base stack using the loadImageStack method.
@@ -441,10 +437,7 @@ class lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         
         triggered - just catches the input from the signal so we can set fileFilter
         """
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
         self.runHook(self.hooks['showStackLoadDialog_Start'])
 
         fname = self.showFileLoadDialog(fileFilter=fileFilter)
