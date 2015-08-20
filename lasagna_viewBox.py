@@ -11,9 +11,12 @@ import pyqtgraph.functions as fn
 from PyQt4 import QtCore, QtGui
 
 class lasagna_viewBox(pg.ViewBox):
+
+    #Make some signals
     mouseWheeled = QtCore.pyqtSignal(object, object) #Make a mouseWheeled signal
     progressLayer = QtCore.pyqtSignal() #This fires when the user mouse-wheels without keyboard modifiers
     mouseDragged = QtCore.pyqtSignal() #This fires when the user mouse-drags without keyboard modifiers
+
     def __init__(self, linkedAxis={}):
         super(lasagna_viewBox,self).__init__()
 
@@ -92,12 +95,17 @@ class lasagna_viewBox(pg.ViewBox):
             thisViewBox.setRange(xRange=x, yRange=y, padding=0)
 
 
+    def mouseReleaseEvent(self, QMouseEvent):
+        print "released"
+
     def mouseClickEvent(self,ev):
         """
         Can be used to capture mouse clicks
         """
         pg.ViewBox.mouseClickEvent(self,ev)
+        print "you clicked me"
 
+        
 
     def onMouseWheeled(self, ev, axis):
         """
