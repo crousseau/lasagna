@@ -34,7 +34,7 @@ import os
 
 import numpy as np
 
-from lasagna.io_libs.sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts
+from lasagna.io_libs.sparse_point_io import read_pts_file, read_masiv_roi, read_lasagna_pts, read_fiji_xml
 from lasagna.plugins.io.io_plugin_base import IoBasePlugin
 
 
@@ -54,15 +54,23 @@ class loaderClass(IoBasePlugin):
         If the file name is valid, it loads the base stack using the load method.
 
         """
+
+        supported_extensions = ('.txt',  # TODO: describe format
+                                '.csv',  # TODO: describe format
+                                '.pts',  # TODO: describe format
+                                '.yml',  # TODO: describe format
+                                '.xml')  # the Fiji xml file type
         
         if not fname:
-            fname = self.lasagna.showFileLoadDialog(fileFilter="Text Files (*.txt *.csv *.pts *.yml)")
+            fname = self.lasagna.showFileLoadDialog(
+                fileFilter="Text Files ({})".format(' '.join(['*{}'.format(e) for e in supported_extensions]))
+            )
 
         if not fname:
             return
 
         if os.path.isfile(fname):
-            if fname.endswith('.pts'):
+            if fname.endswith('.pts'):  # TODO: extract extension
                 data, roi_type = read_pts_file(fname)
                 if roi_type == 'point':
                     print('!!! WARNING points are set in real world coordinates. I assume a pixel size of 1')
@@ -70,6 +78,9 @@ class loaderClass(IoBasePlugin):
                 data = read_masiv_roi(fname)
                 # re-order in lasagna order Z X Y
                 data = [[d[2], d[0], d[1], d[3]] for d in data]
+            elif fname.endswith('.xml'):
+                data = read_fiji_xml(fname)
+                data = [(int(d[0] // 2), int(d[1] // 10), int(d[2] // 10), d[3]) for d in data]  # FIXME: scale as option
             else:
                 data = read_lasagna_pts(fname)
             # A point series should be a list of lists where each list has a length of 3,

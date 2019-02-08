@@ -136,7 +136,7 @@ class Lasagna(QtGui.QMainWindow, lasagna_mainWindow.Ui_lasagna_mainWindow):
         io_paths = list(set(io_paths))  # remove duplicate paths
 
         print("Adding IO module paths to Python path")
-        io_plugins, io_plugin_paths = plugin_handler.find_plugins(io_paths)
+        io_plugins, _ = plugin_handler.find_plugins(io_paths)
         for p in io_paths:
             sys.path.append(p)  # append to system path
             print(p)

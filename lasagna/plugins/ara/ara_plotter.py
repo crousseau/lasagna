@@ -84,6 +84,7 @@ class ARA_plotter(object):  # must inherit LasagnaPlugin first
                                    kind='lines',
                                    data=[])
         self.lasagna.returnIngredientByName(self.contourName).addToPlots()  # Add item to all three 2D plots
+        print('|')
 
     def removeAreaContour(self):
         """

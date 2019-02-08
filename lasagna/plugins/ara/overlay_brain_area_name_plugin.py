@@ -52,13 +52,10 @@ class plugin(AraPluginBase, area_namer_UI.Ui_area_namer):
         """
         # If nothing has been loaded then for sure we need the load button enabled
         if not self.data['currentlyLoadedAtlasName']:
-            self.loadOrig_pushButton.setEnabled(True) 
+            self.loadOrig_pushButton.setEnabled(True)
             return
 
-        if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):  # FIXME: else ?
-            self.loadOrig_pushButton.setEnabled(True) 
-        elif self.data['currentlyLoadedAtlasName'] == str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
-            self.loadOrig_pushButton.setEnabled(False)
+        self.loadOrig_pushButton.setEnabled(not self.data['currentlyLoadedAtlasName'] == self.get_current_atlas_name())
 
     def loadOrig_pushButton_slot(self):
         """
@@ -79,7 +76,7 @@ class plugin(AraPluginBase, area_namer_UI.Ui_area_namer):
         # Load the raw image data but do not display it.
         self.data['atlas'] = image_stack_loader.load_stack(paths['atlas'])
 
-        self.data['currentlyLoadedAtlasName'] = paths['atlas'].split(os.path.sep)[-1]
+        self.data['currentlyLoadedAtlasName'] = paths['atlas'].split(os.path.sep)[-1]  # FIXME: basename
 
     def loadOther_pushButton_slot(self, fnameToLoad=False):
         """
@@ -87,7 +84,7 @@ class plugin(AraPluginBase, area_namer_UI.Ui_area_namer):
         Can optionally load a specific file name (used for de-bugging)
         """
         if not fnameToLoad:
-            file_filter = "Images (*.mhd *.mha *.tiff *.tif *.nrrd)"
+            file_filter = image_stack_loader.image_filter()
             fnameToLoad = QtGui.QFileDialog.getOpenFileName(self,
                                                             'Open file',
                                                             preferences.readPreference('lastLoadDir'),
@@ -95,7 +92,7 @@ class plugin(AraPluginBase, area_namer_UI.Ui_area_namer):
             fnameToLoad = str(fnameToLoad[0])  # tuple with filter as 2nd value
 
         # re-load labels
-        selected_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        selected_name = self.get_current_atlas_name()
         paths = self.paths[selected_name]
         self.data['labels'] = self.loadLabels(paths['labels'])
 

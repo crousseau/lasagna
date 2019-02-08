@@ -30,6 +30,11 @@
     <normalon>:/icons/icons/lasagna_32.png</normalon>
    </iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:#808080;
+
+</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
@@ -89,7 +94,7 @@
      <x>0</x>
      <y>0</y>
      <width>1002</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -188,6 +193,9 @@
                <width>16777215</width>
                <height>21</height>
               </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color: white;</string>
              </property>
              <property name="text">
               <string>Log Y</string>

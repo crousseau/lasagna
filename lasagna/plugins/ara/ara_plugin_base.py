@@ -70,10 +70,10 @@ class AraPluginBase(ARA_plotter, LasagnaPlugin, QtGui.QWidget):
         """
         Remove the contour or add it as soon as the check box is unchecked
         """
-        if not self.highlightArea_checkBox.isChecked():
-            self.removeAreaContour()
-        elif self.highlightArea_checkBox.isChecked():
+        if self.highlightArea_checkBox.isChecked():
             self.addAreaContour()
+        else:
+            self.removeAreaContour()
 
     def link_slots(self):
         pass
@@ -179,6 +179,10 @@ class AraPluginBase(ARA_plotter, LasagnaPlugin, QtGui.QWidget):
         if not self.lasagna.returnIngredientByName(atlas_name):
             print("The current atlas has been removed by the user. Closing the ARA explorer plugin")
             self.closePlugin()
+
+    def get_current_atlas_name(self):
+        return str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+
 
 # ----------------------------
     # Methods to handle close events and errors

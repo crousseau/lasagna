@@ -56,7 +56,7 @@ class lasagna_viewBox(pg.ViewBox):
             return
 
         # Not zoom if the user right-drags, because this messes up stuff. Let's just do all zooming with the wheel
-        if ev.button() & QtCore.Qt.RightButton:
+        if ev.button() & QtCore.Qt.RightButton:  # FIXME: why not and
             return
 
         # Do not drag and link displays if we are pressing the control key.
@@ -72,27 +72,27 @@ class lasagna_viewBox(pg.ViewBox):
         pg.ViewBox.mouseDragEvent(self, ev, axis)
 
         # The following is use dby lasagna_axis.updateDisplayedSlices_2D to link the views
-        for thisView in list(self.linkedAxis.keys()):
+        for view in list(self.linkedAxis.keys()):
             # Get the current view center in x and y
             vr = self.targetRect()
 
             x = None
             y = None
 
-            if self.linkedAxis[thisView]['linkX'] == 'x':
+            if self.linkedAxis[view]['linkX'] == 'x':
                 x = vr.center().x()
 
-            if self.linkedAxis[thisView]['linkY'] == 'y':
+            if self.linkedAxis[view]['linkY'] == 'y':
                 y = vr.center().y()
 
-            if self.linkedAxis[thisView]['linkX'] == 'y':
+            if self.linkedAxis[view]['linkX'] == 'y':
                 y = vr.center().x()
 
-            if self.linkedAxis[thisView]['linkY'] == 'x':
+            if self.linkedAxis[view]['linkY'] == 'x':
                 x = vr.center().y()
 
-            self.centreOn(thisView, x, y)
-            thisView.scaleBy([1, 1])
+            self.centreOn(view, x, y)
+            view.scaleBy([1, 1])
 
     def centreOn(self, thisViewBox, x=None, y=None):
         """

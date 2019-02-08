@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file './designerFiles/lasagna_mainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets, Qt
-from PyQt5.QtGui import QColor
-
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_lasagna_mainWindow(object):
     def setupUi(self, lasagna_mainWindow):
@@ -23,6 +21,9 @@ class Ui_lasagna_mainWindow(object):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/icons/lasagna_32.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         lasagna_mainWindow.setWindowIcon(icon)
+        lasagna_mainWindow.setStyleSheet("background-color:#808080;\n"
+"\n"
+"")
         self.centralwidget = QtWidgets.QWidget(lasagna_mainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -64,7 +65,7 @@ class Ui_lasagna_mainWindow(object):
         self.gridLayout.addWidget(self.splitter_3, 0, 0, 1, 1)
         lasagna_mainWindow.setCentralWidget(self.centralwidget)
         self.menuBar = QtWidgets.QMenuBar(lasagna_mainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 26))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1002, 25))
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
         self.menuFile.setObjectName("menuFile")
@@ -112,6 +113,7 @@ class Ui_lasagna_mainWindow(object):
         sizePolicy.setHeightForWidth(self.logYcheckBox.sizePolicy().hasHeightForWidth())
         self.logYcheckBox.setSizePolicy(sizePolicy)
         self.logYcheckBox.setMaximumSize(QtCore.QSize(16777215, 21))
+        self.logYcheckBox.setStyleSheet("color: white;")
         self.logYcheckBox.setChecked(True)
         self.logYcheckBox.setObjectName("logYcheckBox")
         self.horizontalLayout_13.addWidget(self.logYcheckBox)
@@ -587,7 +589,6 @@ class Ui_lasagna_mainWindow(object):
         self.actionNone.setText(_translate("lasagna_mainWindow", "none"))
         self.actionOpen_2.setText(_translate("lasagna_mainWindow", "Open"))
 
-
+from lasagnaplotwidget import LasagnaPlotWidget
 from pyqtgraph import PlotWidget
-from lasagna.lasagnaplotwidget import LasagnaPlotWidget
-from lasagna import mainWindow_rc
+import mainWindow_rc

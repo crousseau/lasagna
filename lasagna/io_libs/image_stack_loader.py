@@ -14,6 +14,7 @@ import struct
 import numpy as np
 
 from lasagna.utils import preferences, path_utils
+from amap.brain import brain_io as bio
 
 
 # -------------------------------------------------------------------------------------------
@@ -41,12 +42,16 @@ def load_stack(fname):
     load_stack determines the data type from the file extension determines what data are to be
     loaded and chooses the approproate function to return the data.
     """
-    if fname.lower().endswith('.tif') or fname.lower().endswith('.tiff'):
+    ext = os.path.splitext(fname.lower())[-1]
+    if ext in ('.tif', '.tiff'):
         return load_tiff_stack(fname)
-    elif fname.lower().endswith('.mhd'):
+    elif ext == '.mhd':
         return mhd_read(fname)
-    elif fname.lower().endswith('.nrrd') or fname.lower().endswith('.nrd'):
+    elif ext in ('.nrrd', '.nrd'):
         return nrrd_read(fname)
+    elif ext == '.nii':
+        arr = bio.load_nii(fname, as_array=True)
+        return np.transpose(arr, (2, 1, 0))
     else:
         print("\n\n*{} NOT LOADED. DATA TYPE NOT KNOWN\n\n".format(fname))
 
@@ -68,7 +73,7 @@ def image_filter():
     As image formats are added (or removed) from this module, this
     string should be manually modified accordingly.
     """
-    return "Images (*.mhd *.tiff *.tif *.nrrd *.nrd)"
+    return "Images (*.mhd *.tiff *.tif *.nrrd *.nrd *.nii)"
 
 
 def get_voxel_spacing(fname, fall_back_mode=False):

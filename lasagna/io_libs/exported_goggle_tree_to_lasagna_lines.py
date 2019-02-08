@@ -28,41 +28,22 @@ import sys
 import os
 import argparse
 
-from lasagna.tree import importData
-
-# Parse command-line input arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("-f", help="File name to load")
-parser.add_argument("-p", help="Optionally plot tree", action="store_true")
-parser.add_argument("-q", help="Quiet - do not dump processed tree to standard output", action="store_true")
-
-args = parser.parse_args()
-
-fname = args.f
-do_plot = args.p
-quiet = args.q
+from lasagna.tree.tree_parser import parse_file
 
 
-if fname is None:
-    print("Please supply a file name to convert. e.g.:\nexportedGoggleTree2LasagnaLines.py -f myFile.csv\n")
-    sys.exit(0)
+def get_parser():
+    # Parse command-line input arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file-name', dest='file_name', type=str,
+                        help='File name to load')
+    parser.add_argument('-p', '--plot', action='store_true',
+                        help='Optionally plot tree')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='Quiet - do not dump processed tree to standard output')
+    return parser
 
 
-# Get the data out of the tree
-if not os.path.exists(fname):
-    print('Can not find ' + fname)
-    sys.exit(0)
-
-
-data_tree = importData(fname, headerLine=['id', 'parent', 'z', 'x', 'y'])
-
-# Get the unique segments of each tree
-paths = []
-for segment in data_tree.find_segments():
-    paths.append(segment)
-
-
-def dataFromPath(tree, path):
+def data_from_path(tree, path):
     """
     Get the data from the tree given a path.
     """
@@ -78,66 +59,85 @@ def dataFromPath(tree, path):
     return z, x, y
 
 
-# Show paths in standard output
-if not quiet:
-    for i, path in enumerate(paths):
-        data = dataFromPath(data_tree, path)
-        for j in range(len(data[0])):
-            print("%d,%d,%d,%d" % (i, data[0][j], data[1][j], data[2][j]))
+def main():
+    args = get_parser().parse_args()
+    fname = args.file_name
+    check_file_name(fname)
+
+    # Get the data out of the tree
+    data_tree = parse_file(fname, header_line=['id', 'parent', 'z', 'x', 'y'])
+
+    # Get the unique segments of each tree
+    paths = [segment for segment in data_tree.find_segments()]
+
+    # Show paths in standard output
+    if not args.quiet:
+        for i, path in enumerate(paths):
+            data = data_from_path(data_tree, path)
+            for j in range(len(data[0])):  # FIXME: len(data[1]) ?)
+                print("%d,%d,%d,%d" % (i, data[0][j], data[1][j], data[2][j]))
+
+    if args.plot:
+        plot_points(data_tree, paths)
 
 
-# -------------------------------------------------
-# Optionally plot
-if not do_plot:
-    sys.exit(0)
+def plot_points(data_tree, paths):
+    from pyqtgraph.Qt import QtGui
+    import pyqtgraph as pg
+    # Set up the window
+    app = QtGui.QApplication([])
+    main_window = QtGui.QMainWindow()
+    main_window.resize(800, 800)
+    view = pg.GraphicsLayoutWidget()  # GraphicsView with GraphicsLayout inserted by default
+    main_window.setCentralWidget(view)
+    main_window.show()
+    main_window.setWindowTitle('Neurite Tree')
+    # view 1
+    w1 = view.addPlot()
+    path_item = []
+    for path in paths:
+        path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o',
+                                         symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))  # FIXME: extract
+        data = data_from_path(data_tree, path)
+        path_item[-1].setData(x=data[0], y=data[1])  # Only different line
+        w1.addItem(path_item[-1])
 
-from pyqtgraph.Qt import QtGui, QtCore
-import pyqtgraph as pg
+    # view 2
+    w2 = view.addPlot()
+    path_item = []
+    for path in paths:
+        path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o',
+                                         symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
+        data = data_from_path(data_tree, path)
+        path_item[-1].setData(x=data[0], y=data[2])  # Only different line
+        w2.addItem(path_item[-1])
 
-# Set up the window
-app = QtGui.QApplication([])
-main_window = QtGui.QMainWindow()
-main_window.resize(800, 800)
-
-view = pg.GraphicsLayoutWidget()  # GraphicsView with GraphicsLayout inserted by default
-main_window.setCentralWidget(view)
-main_window.show()
-main_window.setWindowTitle('Neurite Tree')
-
-
-# view 1
-w1 = view.addPlot()
-path_item = []
-for path in paths:
-    path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))  # FIXME: extract
-    data = dataFromPath(data_tree, path)
-    path_item[-1].setData(x=data[0], y=data[1])
-    w1.addItem(path_item[-1])
+    # view 3
+    view.nextRow()
+    w3 = view.addPlot()
+    path_item = []
+    for path in paths:
+        path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o',
+                                         symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
+        data = data_from_path(data_tree, path)
+        path_item[-1].setData(x=data[1], y=data[2])  # Only different line
+        w3.addItem(path_item[-1])
 
 
-# view 2
-w2 = view.addPlot()
-path_item = []
-for path in paths:
-    path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
-    data = dataFromPath(data_tree, path)
-    path_item[-1].setData(x=data[0], y=data[2])
-    w2.addItem(path_item[-1])
-
-
-# view 3
-view.nextRow()
-w3 = view.addPlot()
-path_item = []
-for path in paths:
-    path_item.append(pg.PlotDataItem(size=10, pen='w', symbol='o', symbolSize=2, brush=pg.mkBrush(255, 255, 255, 120)))
-    data = dataFromPath(data_tree, path)
-    path_item[-1].setData(x=data[1], y=data[2])
-    w3.addItem(path_item[-1])
+def check_file_name(fname):
+    if fname is None:
+        print("Please supply a file name to convert. e.g.:\n"
+              "exported_goggle_tree_to_lasagna_lines.py -f myFile.csv\n")
+        sys.exit(0)
+    if not os.path.exists(fname):
+        print('Can not find {}'.format(fname))
+        sys.exit(0)
 
 
 # Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
     import sys
-    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+    from pyqtgraph.Qt import QtGui, QtCore
+    main()
+    if sys.flags.interactive != 1 or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()

@@ -128,6 +128,13 @@ def read_masiv_roi(file_path):
     return roi_coords
 
 
+def read_fiji_xml(xml_file_path):
+    from cell_count_analysis.cells import get_cells
+    cells = get_cells(xml_file_path, cells_only=False)
+    # Reorded in lasagna z, x, y, type
+    return [(c.z, c.x, c.y, c.type) for c in cells]
+
+
 def read_lasagna_pts(fname):
     """ Read default lasagna pts format
 

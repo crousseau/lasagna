@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file './designerFiles/alert.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_alertBox(object):
     def setupUi(self, alertBox):
@@ -60,4 +59,4 @@ class Ui_alertBox(object):
         alertBox.setWindowTitle(_translate("alertBox", "Lasagna Alert"))
         self.closeButton.setText(_translate("alertBox", "&Close"))
 
-from lasagna import mainWindow_rc
+import mainWindow_rc

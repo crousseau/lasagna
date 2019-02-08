@@ -42,7 +42,7 @@ class plugin(AraPluginBase, ara_explorer_UI.Ui_ara_explorer):
 
     def autoload_first_ara_entry(self):
         # If the user has asked for this, load the first ARA entry automatically
-        currently_selected_ara = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        currently_selected_ara = self.get_current_atlas_name()
         if self.prefs['loadFirstAtlasOnStartup']:
             print("Auto-Loading {}".format(currently_selected_ara))
             self.loadARA(currently_selected_ara)
@@ -71,19 +71,15 @@ class plugin(AraPluginBase, ara_explorer_UI.Ui_ara_explorer):
         """
         # If nothing has been loaded then for sure we need the load button enabled
         if not self.data['currentlyLoadedAtlasName']:
-            self.load_pushButton.setEnabled(True) 
+            self.load_pushButton.setEnabled(True)
             return
-
-        if self.data['currentlyLoadedAtlasName'] != str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):  # FIXME: else ?
-            self.load_pushButton.setEnabled(True) 
-        elif self.data['currentlyLoadedAtlasName'] == str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex())):
-            self.load_pushButton.setEnabled(False)
+        self.load_pushButton.setEnabled(not self.data['currentlyLoadedAtlasName'] == self.get_current_atlas_name())
 
     def load_pushButton_slot(self):
         """
         Load the currently selected ARA version
         """
-        selected_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
+        selected_name = self.get_current_atlas_name()
         self.loadARA(selected_name)
 
     def overlayTemplate_checkBox_slot(self):
@@ -131,7 +127,7 @@ class plugin(AraPluginBase, ara_explorer_UI.Ui_ara_explorer):
 
         self.lasagna.loadImageStack(paths['atlas'])
         
-        self.data['currentlyLoadedAtlasName'] = paths['atlas'].split(os.path.sep)[-1]
+        self.data['currentlyLoadedAtlasName'] = paths['atlas'].split(os.path.sep)[-1]  # FIXME: basename
 
         self.data['template'] = paths['template']
         if os.path.exists(paths['template']):
@@ -151,7 +147,8 @@ class plugin(AraPluginBase, ara_explorer_UI.Ui_ara_explorer):
         Add an overlay
         """
         self.lasagna.loadImageStack(fname)
-        self.data['currentlyLoadedOverlay'] = str(fname.split(os.path.sep)[-1])
+        # self.data['currentlyLoadedOverlay'] = str(fname.split(os.path.sep)[-1])  # TODO: Check if below line works
+        self.data['currentlyLoadedOverlay'] = os.path.basename(fname)
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedAtlasName']).lut = 'gray'
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).lut = 'cyan'
         self.lasagna.returnIngredientByName(self.data['currentlyLoadedOverlay']).minMax = [0, 1.5E3]
@@ -213,8 +210,9 @@ class plugin(AraPluginBase, ara_explorer_UI.Ui_ara_explorer):
             self.drawAreaHighlight(image_stack, tree_index, highlightOnlyCurrentAxis=False)
 
     def get_atlas_image_stack(self, plugin_name=None):
-        ara_name = str(self.araName_comboBox.itemText(self.araName_comboBox.currentIndex()))
-        atlas_layer_name = self.paths[ara_name]['atlas'].split(os.path.sep)[-1]
+        ara_name = self.get_current_atlas_name()
+        # atlas_layer_name = self.paths[ara_name]['atlas'].split(os.path.sep)[-1]  # TODO: check if below line works
+        atlas_layer_name = os.path.basename(self.paths[ara_name]['atlas'])
         ingredient = self.lasagna.returnIngredientByName(atlas_layer_name)
         if not ingredient:
             if plugin_name is not None:
